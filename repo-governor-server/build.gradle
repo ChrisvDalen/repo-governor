@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+}
+
+dependencies {
+    implementation platform("org.springframework.boot:spring-boot-dependencies:4.0.6")
+    testImplementation platform("org.springframework.boot:spring-boot-dependencies:4.0.6")
+    testImplementation platform("org.testcontainers:testcontainers-bom:1.21.3")
+
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// Serve the contract-first OpenAPI spec at /api/docs/openapi.yaml.
+processResources {
+    from(rootProject.file('repo-governor-contracts/openapi.yaml')) {
+        into 'static/api/docs'
+    }
+}

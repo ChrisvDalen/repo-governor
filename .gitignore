@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Node / Angular
+node_modules/
+.angular/
+dist/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Repo Governor output
+repo-governor-report.json
+repo-governor-report.md
