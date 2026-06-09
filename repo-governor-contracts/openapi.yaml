@@ -1,0 +1,653 @@
+openapi: 3.0.3
+info:
+  title: Repo Governor API
+  description: REST API of the Repo Governor SaaS dashboard. All endpoints require an `X-API-Key` header.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/v1/scan-reports:
+    post:
+      operationId: uploadScanReport
+      summary: Upload a scan report produced by the CLI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanReportPayload'
+      responses:
+        '201':
+          description: Report stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanUploadResult'
+  /api/v1/organizations:
+    get:
+      operationId: listOrganizations
+      responses:
+        '200':
+          description: Organizations visible to the caller
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
+    post:
+      operationId: createOrganization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+  /api/v1/organizations/{organizationId}:
+    get:
+      operationId: getOrganization
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      responses:
+        '200':
+          description: Organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+  /api/v1/organizations/{organizationId}/dashboard:
+    get:
+      operationId: getOrganizationDashboard
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      responses:
+        '200':
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+  /api/v1/organizations/{organizationId}/teams:
+    get:
+      operationId: listTeams
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      responses:
+        '200':
+          description: Teams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+    post:
+      operationId: createTeam
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+  /api/v1/repositories:
+    get:
+      operationId: listRepositories
+      responses:
+        '200':
+          description: Repositories of the caller's organization
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RepositorySummary'
+    post:
+      operationId: registerRepository
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRepositoryRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositorySummary'
+  /api/v1/repositories/{repositoryId}:
+    get:
+      operationId: getRepository
+      parameters:
+        - $ref: '#/components/parameters/RepositoryId'
+      responses:
+        '200':
+          description: Repository detail including latest scan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryDetail'
+  /api/v1/repositories/{repositoryId}/scans:
+    get:
+      operationId: listScans
+      parameters:
+        - $ref: '#/components/parameters/RepositoryId'
+      responses:
+        '200':
+          description: Scan history, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScanSummary'
+  /api/v1/repositories/{repositoryId}/findings:
+    get:
+      operationId: listFindings
+      parameters:
+        - $ref: '#/components/parameters/RepositoryId'
+        - name: severity
+          in: query
+          schema:
+            $ref: '#/components/schemas/Severity'
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/Category'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/FindingStatus'
+      responses:
+        '200':
+          description: Findings of the latest scan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Finding'
+  /api/v1/scans/{scanId}:
+    get:
+      operationId: getScan
+      parameters:
+        - $ref: '#/components/parameters/ScanId'
+      responses:
+        '200':
+          description: Scan detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanDetail'
+  /api/v1/scans/{scanId}/diff:
+    get:
+      operationId: getScanDiff
+      parameters:
+        - $ref: '#/components/parameters/ScanId'
+      responses:
+        '200':
+          description: Comparison with the previous scan of the same repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanDiff'
+  /api/v1/findings/{findingId}/status:
+    patch:
+      operationId: updateFindingStatus
+      parameters:
+        - name: findingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFindingStatusRequest'
+      responses:
+        '200':
+          description: Updated finding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finding'
+  /api/v1/rules:
+    get:
+      operationId: listRules
+      responses:
+        '200':
+          description: Rules with the caller organization's configuration
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RuleWithConfiguration'
+  /api/v1/rules/{ruleId}/configuration:
+    patch:
+      operationId: updateRuleConfiguration
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleConfigurationRequest'
+      responses:
+        '200':
+          description: Updated rule configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleWithConfiguration'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  parameters:
+    OrganizationId:
+      name: organizationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RepositoryId:
+      name: repositoryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ScanId:
+      name: scanId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    Severity:
+      type: string
+      enum: [BLOCKER, MAJOR, MINOR, INFO]
+    Category:
+      type: string
+      enum: [REPO_HEALTH, JAVA, SPRING_BOOT, ANGULAR, API_CONTRACT, CI_CD, SECURITY, AI_READINESS, DOCUMENTATION]
+    FindingStatus:
+      type: string
+      enum: [OPEN, ACCEPTED_RISK, RESOLVED]
+    Organization:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    CreateOrganizationRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+    Team:
+      type: object
+      required: [id, organizationId, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        organizationId:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CreateTeamRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+    RegisterRepositoryRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        teamName:
+          type: string
+    RepositorySummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        teamName:
+          type: string
+          nullable: true
+        latestScore:
+          type: integer
+          nullable: true
+        blockerCount:
+          type: integer
+        majorCount:
+          type: integer
+        lastScannedAt:
+          type: string
+          format: date-time
+          nullable: true
+        detectedTechnologies:
+          type: array
+          items:
+            type: string
+    RepositoryDetail:
+      allOf:
+        - $ref: '#/components/schemas/RepositorySummary'
+        - type: object
+          properties:
+            latestScan:
+              $ref: '#/components/schemas/ScanDetail'
+    CategoryScore:
+      type: object
+      required: [category, score]
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+        score:
+          type: integer
+    Finding:
+      type: object
+      required: [id, ruleId, title, severity, category, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        ruleId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        filePath:
+          type: string
+          nullable: true
+        lineNumber:
+          type: integer
+          nullable: true
+        recommendation:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/FindingStatus'
+        createdAt:
+          type: string
+          format: date-time
+    ScanSummary:
+      type: object
+      required: [id, repositoryId, overallScore, scannedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        repositoryId:
+          type: string
+          format: uuid
+        branch:
+          type: string
+          nullable: true
+        commitHash:
+          type: string
+          nullable: true
+        scannedAt:
+          type: string
+          format: date-time
+        toolVersion:
+          type: string
+        overallScore:
+          type: integer
+        blockerCount:
+          type: integer
+        majorCount:
+          type: integer
+    ScanDetail:
+      allOf:
+        - $ref: '#/components/schemas/ScanSummary'
+        - type: object
+          properties:
+            categoryScores:
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoryScore'
+            findings:
+              type: array
+              items:
+                $ref: '#/components/schemas/Finding'
+            detectedTechnologies:
+              type: array
+              items:
+                type: string
+            metadata:
+              type: object
+              additionalProperties:
+                type: string
+    ScanDiff:
+      type: object
+      required: [scanId, newFindings, resolvedFindings, scoreDelta]
+      properties:
+        scanId:
+          type: string
+          format: uuid
+        previousScanId:
+          type: string
+          format: uuid
+          nullable: true
+        scoreDelta:
+          type: integer
+        newFindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Finding'
+        resolvedFindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Finding'
+    ScanUploadResult:
+      type: object
+      required: [scanId, repositoryId, overallScore]
+      properties:
+        scanId:
+          type: string
+          format: uuid
+        repositoryId:
+          type: string
+          format: uuid
+        overallScore:
+          type: integer
+    ScanReportPayload:
+      type: object
+      required: [repositoryName, scannedAt, toolVersion, overallScore, categoryScores, findings]
+      properties:
+        repositoryName:
+          type: string
+        organization:
+          type: string
+          nullable: true
+        team:
+          type: string
+          nullable: true
+        branch:
+          type: string
+          nullable: true
+        commitHash:
+          type: string
+          nullable: true
+        scannedAt:
+          type: string
+          format: date-time
+        toolVersion:
+          type: string
+        overallScore:
+          type: integer
+        categoryScores:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryScore'
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportFinding'
+        detectedTechnologies:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+    ReportFinding:
+      type: object
+      required: [ruleId, title, severity, category]
+      properties:
+        ruleId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        filePath:
+          type: string
+          nullable: true
+        lineNumber:
+          type: integer
+          nullable: true
+        recommendation:
+          type: string
+          nullable: true
+    RuleWithConfiguration:
+      type: object
+      required: [id, ruleKey, title, category, severity, enabled]
+      properties:
+        id:
+          type: string
+          format: uuid
+        ruleKey:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        category:
+          $ref: '#/components/schemas/Category'
+        severity:
+          $ref: '#/components/schemas/Severity'
+        enabled:
+          type: boolean
+        threshold:
+          type: integer
+          nullable: true
+    UpdateRuleConfigurationRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        threshold:
+          type: integer
+          nullable: true
+    UpdateFindingStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/FindingStatus'
+    DashboardSummary:
+      type: object
+      required: [organizationId, overallScore, repositoryCount, blockerFindings, majorFindings]
+      properties:
+        organizationId:
+          type: string
+          format: uuid
+        overallScore:
+          type: integer
+        repositoryCount:
+          type: integer
+        blockerFindings:
+          type: integer
+        majorFindings:
+          type: integer
+        worstRepositories:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepositorySummary'
+        improvingRepositories:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepositoryTrend'
+        degradingRepositories:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepositoryTrend'
+        latestScans:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanSummary'
+    RepositoryTrend:
+      type: object
+      required: [repositoryId, name, currentScore, previousScore]
+      properties:
+        repositoryId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        currentScore:
+          type: integer
+        previousScore:
+          type: integer
