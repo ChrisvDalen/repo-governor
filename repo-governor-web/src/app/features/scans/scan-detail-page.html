@@ -1,0 +1,86 @@
+<app-loading-error [loading]="scan.loading()" [error]="scan.error()" />
+
+@if (scan.data(); as detail) {
+  <div class="header">
+    <h1>Scan {{ detail.scannedAt | date: 'medium' }}</h1>
+    <app-score-badge [score]="detail.overallScore" />
+  </div>
+  <p class="meta">
+    <a [routerLink]="['/repositories', detail.repositoryId]">← back to repository</a> ·
+    Branch: {{ detail.branch ?? '—' }} ·
+    Commit: <code>{{ detail.commitHash ?? '—' }}</code> ·
+    Tool: {{ detail.toolVersion }}
+  </p>
+
+  <div class="panel-row">
+    <mat-card>
+      <mat-card-header><mat-card-title>Category scores</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <table class="simple-table">
+          @for (category of detail.categoryScores; track category.category) {
+            <tr>
+              <td>{{ category.category }}</td>
+              <td><app-score-badge [score]="category.score" /></td>
+            </tr>
+          }
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Diff with previous scan</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @if (diff.data(); as scanDiff) {
+          @if (scanDiff.previousScanId === null) {
+            <p class="empty">This is the first scan of the repository.</p>
+          } @else {
+            <p>
+              Score change:
+              <strong [class.up]="scanDiff.scoreDelta > 0" [class.down]="scanDiff.scoreDelta < 0">
+                {{ scanDiff.scoreDelta > 0 ? '+' : '' }}{{ scanDiff.scoreDelta }}
+              </strong>
+            </p>
+            <p>{{ scanDiff.newFindings.length }} new, {{ scanDiff.resolvedFindings.length }} resolved</p>
+            @if (scanDiff.newFindings.length > 0) {
+              <h3>New findings</h3>
+              <ul>
+                @for (finding of scanDiff.newFindings; track finding.id) {
+                  <li>{{ finding.title }} <code>{{ finding.ruleId }}</code></li>
+                }
+              </ul>
+            }
+            @if (scanDiff.resolvedFindings.length > 0) {
+              <h3>Resolved findings</h3>
+              <ul>
+                @for (finding of scanDiff.resolvedFindings; track finding.id) {
+                  <li>{{ finding.title }} <code>{{ finding.ruleId }}</code></li>
+                }
+              </ul>
+            }
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Metadata</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <table class="simple-table">
+          @for (entry of detail.metadata | keyvalue; track entry.key) {
+            <tr>
+              <td>{{ entry.key }}</td>
+              <td>{{ entry.value }}</td>
+            </tr>
+          }
+          <tr>
+            <td>technologies</td>
+            <td>{{ detail.detectedTechnologies.join(', ') }}</td>
+          </tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <h2>Findings ({{ detail.findings.length }})</h2>
+  <app-findings-table [findings]="detail.findings" />
+}

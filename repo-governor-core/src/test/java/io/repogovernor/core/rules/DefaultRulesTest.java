@@ -123,6 +123,7 @@ class DefaultRulesTest {
                 .withFile("src/main/java/demo/CleanController.java", """
                         class CleanController {
                           private final UserService userService;
+                          void load() { userService.listForRepository("x"); }
                         }
                         """);
 

@@ -1,0 +1,55 @@
+<app-loading-error [loading]="repository.loading()" [error]="repository.error()" />
+
+@if (repository.data(); as repo) {
+  <div class="header">
+    <h1>{{ repo.name }}</h1>
+    <app-score-badge [score]="repo.latestScore" />
+  </div>
+  <p class="meta">
+    Team: {{ repo.teamName ?? '—' }} ·
+    Last scanned: {{ repo.lastScannedAt ? (repo.lastScannedAt | date: 'medium') : 'never' }} ·
+    @for (tech of repo.detectedTechnologies; track tech) {
+      <span class="tech">{{ tech }}</span>
+    }
+  </p>
+
+  @if (repo.latestScan; as scan) {
+    <div class="panel-row">
+      <mat-card>
+        <mat-card-header><mat-card-title>Category scores</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <table class="simple-table">
+            @for (category of scan.categoryScores; track category.category) {
+              <tr>
+                <td>{{ category.category }}</td>
+                <td><app-score-badge [score]="category.score" /></td>
+              </tr>
+            }
+          </table>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header><mat-card-title>Scan history</mat-card-title></mat-card-header>
+        <mat-card-content>
+          @if (scans.data(); as history) {
+            <table class="simple-table">
+              @for (item of history; track item.id) {
+                <tr>
+                  <td><a [routerLink]="['/repositories', repo.id, 'scans', item.id]">{{ item.scannedAt | date: 'short' }}</a></td>
+                  <td>{{ item.branch ?? '—' }}</td>
+                  <td><app-score-badge [score]="item.overallScore" /></td>
+                </tr>
+              }
+            </table>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <h2>Findings ({{ scan.findings.length }})</h2>
+    <app-findings-table [findings]="scan.findings" [triageEnabled]="true" (statusChanged)="reload()" />
+  } @else {
+    <p>This repository has not been scanned yet.</p>
+  }
+}

@@ -1,0 +1,36 @@
+<h1>Rules</h1>
+<p class="intro">Rules evaluated by the CLI. Disable a rule or set a threshold for your organization.</p>
+
+<app-loading-error [loading]="rules.loading()" [error]="rules.error()" />
+
+@if (rules.data(); as ruleList) {
+  <table mat-table [dataSource]="ruleList">
+    <ng-container matColumnDef="rule">
+      <th mat-header-cell *matHeaderCellDef>Rule</th>
+      <td mat-cell *matCellDef="let rule">
+        <div class="title">{{ rule.title }}</div>
+        <div class="rule-id">{{ rule.ruleKey }}</div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef>Category</th>
+      <td mat-cell *matCellDef="let rule">{{ rule.category }}</td>
+    </ng-container>
+    <ng-container matColumnDef="severity">
+      <th mat-header-cell *matHeaderCellDef>Severity</th>
+      <td mat-cell *matCellDef="let rule"><app-severity-chip [severity]="rule.severity" /></td>
+    </ng-container>
+    <ng-container matColumnDef="threshold">
+      <th mat-header-cell *matHeaderCellDef>Threshold</th>
+      <td mat-cell *matCellDef="let rule">{{ rule.threshold ?? '—' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="enabled">
+      <th mat-header-cell *matHeaderCellDef>Enabled</th>
+      <td mat-cell *matCellDef="let rule">
+        <mat-slide-toggle [checked]="rule.enabled" (change)="toggle(rule, $event.checked)" />
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+}
