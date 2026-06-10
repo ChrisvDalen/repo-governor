@@ -1,0 +1,92 @@
+<h1>Dashboard</h1>
+
+<app-loading-error [loading]="dashboard.loading()" [error]="dashboard.error()" />
+
+@if (dashboard.data(); as summary) {
+  <div class="kpi-row">
+    <mat-card>
+      <mat-card-content>
+        <div class="kpi-label">Overall score</div>
+        <div class="kpi-value"><app-score-badge [score]="summary.overallScore" /></div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-content>
+        <div class="kpi-label">Repositories</div>
+        <div class="kpi-value">{{ summary.repositoryCount }}</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-content>
+        <div class="kpi-label">Blocker findings</div>
+        <div class="kpi-value blocker">{{ summary.blockerFindings }}</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-content>
+        <div class="kpi-label">Major findings</div>
+        <div class="kpi-value major">{{ summary.majorFindings }}</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="panel-row">
+    <mat-card>
+      <mat-card-header><mat-card-title>Worst repositories</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @if (summary.worstRepositories.length === 0) {
+          <p class="empty">No scanned repositories yet.</p>
+        } @else {
+          <table class="simple-table">
+            @for (repo of summary.worstRepositories; track repo.id) {
+              <tr>
+                <td><a [routerLink]="['/repositories', repo.id]">{{ repo.name }}</a></td>
+                <td><app-score-badge [score]="repo.latestScore" /></td>
+              </tr>
+            }
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Score trend</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @if (summary.improvingRepositories.length === 0 && summary.degradingRepositories.length === 0) {
+          <p class="empty">Trends appear after a repository has at least two scans.</p>
+        }
+        @for (trend of summary.improvingRepositories; track trend.repositoryId) {
+          <div class="trend up">
+            ▲ <a [routerLink]="['/repositories', trend.repositoryId]">{{ trend.name }}</a>
+            {{ trend.previousScore }} → {{ trend.currentScore }}
+          </div>
+        }
+        @for (trend of summary.degradingRepositories; track trend.repositoryId) {
+          <div class="trend down">
+            ▼ <a [routerLink]="['/repositories', trend.repositoryId]">{{ trend.name }}</a>
+            {{ trend.previousScore }} → {{ trend.currentScore }}
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Latest scans</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @if (summary.latestScans.length === 0) {
+          <p class="empty">No scans uploaded yet. Run <code>repo-governor scan . --upload</code>.</p>
+        } @else {
+          <table class="simple-table">
+            @for (scan of summary.latestScans; track scan.id) {
+              <tr>
+                <td><a [routerLink]="['/repositories', scan.repositoryId, 'scans', scan.id]">{{ scan.scannedAt | date: 'short' }}</a></td>
+                <td>{{ scan.branch ?? '—' }}</td>
+                <td><app-score-badge [score]="scan.overallScore" /></td>
+              </tr>
+            }
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

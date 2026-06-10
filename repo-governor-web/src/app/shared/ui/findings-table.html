@@ -1,0 +1,53 @@
+@if (findings().length === 0) {
+  <p class="empty">No findings — well done!</p>
+} @else {
+  <table mat-table [dataSource]="findings()">
+    <ng-container matColumnDef="severity">
+      <th mat-header-cell *matHeaderCellDef>Severity</th>
+      <td mat-cell *matCellDef="let finding"><app-severity-chip [severity]="finding.severity" /></td>
+    </ng-container>
+    <ng-container matColumnDef="rule">
+      <th mat-header-cell *matHeaderCellDef>Finding</th>
+      <td mat-cell *matCellDef="let finding">
+        <div class="title" [matTooltip]="finding.description ?? ''">{{ finding.title }}</div>
+        <div class="rule-id">{{ finding.ruleId }}</div>
+        @if (finding.recommendation) {
+          <div class="recommendation">{{ finding.recommendation }}</div>
+        }
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef>Category</th>
+      <td mat-cell *matCellDef="let finding">{{ finding.category }}</td>
+    </ng-container>
+    <ng-container matColumnDef="file">
+      <th mat-header-cell *matHeaderCellDef>File</th>
+      <td mat-cell *matCellDef="let finding">
+        @if (finding.filePath) {
+          <code>{{ finding.filePath }}@if (finding.lineNumber) {:{{ finding.lineNumber }}}</code>
+        } @else {
+          —
+        }
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let finding">
+        <span class="status" [class]="'status-' + finding.status.toLowerCase()">{{ finding.status }}</span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let finding">
+        @if (finding.status === 'OPEN') {
+          <button matButton (click)="setStatus(finding, 'ACCEPTED_RISK')">Accept risk</button>
+          <button matButton (click)="setStatus(finding, 'RESOLVED')">Resolve</button>
+        } @else {
+          <button matButton (click)="setStatus(finding, 'OPEN')">Reopen</button>
+        }
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+}

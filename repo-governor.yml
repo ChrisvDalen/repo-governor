@@ -1,0 +1,12 @@
+project:
+  name: repo-governor
+  type: auto
+  organization: demo-org
+  team: platform
+server:
+  url: http://localhost:8080
+rules:
+  enabled: []   # empty means: all default rules
+thresholds:
+  overall: 70
+  blockerAllowed: false

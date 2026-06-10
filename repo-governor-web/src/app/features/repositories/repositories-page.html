@@ -1,0 +1,49 @@
+<h1>Repositories</h1>
+
+<app-loading-error [loading]="repositories.loading()" [error]="repositories.error()" />
+
+@if (repositories.data(); as repos) {
+  @if (repos.length === 0) {
+    <p>No repositories yet. Scan and upload one with the CLI:</p>
+    <pre>repo-governor scan . --upload --server http://localhost:8080 --api-key dev-api-key</pre>
+  } @else {
+    <table mat-table [dataSource]="repos">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Repository</th>
+        <td mat-cell *matCellDef="let repo">
+          <a [routerLink]="['/repositories', repo.id]">{{ repo.name }}</a>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="team">
+        <th mat-header-cell *matHeaderCellDef>Team</th>
+        <td mat-cell *matCellDef="let repo">{{ repo.teamName ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="score">
+        <th mat-header-cell *matHeaderCellDef>Score</th>
+        <td mat-cell *matCellDef="let repo"><app-score-badge [score]="repo.latestScore" /></td>
+      </ng-container>
+      <ng-container matColumnDef="blockers">
+        <th mat-header-cell *matHeaderCellDef>Blockers</th>
+        <td mat-cell *matCellDef="let repo">{{ repo.blockerCount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="majors">
+        <th mat-header-cell *matHeaderCellDef>Majors</th>
+        <td mat-cell *matCellDef="let repo">{{ repo.majorCount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="lastScanned">
+        <th mat-header-cell *matHeaderCellDef>Last scanned</th>
+        <td mat-cell *matCellDef="let repo">{{ repo.lastScannedAt ? (repo.lastScannedAt | date: 'short') : 'never' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="technologies">
+        <th mat-header-cell *matHeaderCellDef>Technologies</th>
+        <td mat-cell *matCellDef="let repo">
+          @for (tech of repo.detectedTechnologies; track tech) {
+            <span class="tech">{{ tech }}</span>
+          }
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    </table>
+  }
+}

@@ -1,0 +1,26 @@
+<h1>Settings</h1>
+
+<mat-card class="settings-card">
+  <mat-card-header>
+    <mat-card-title>API key</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      All dashboard data is read through the Repo Governor API using an API key.
+      For local development the server seeds the key <code>dev-api-key</code>.
+    </p>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>API key</mat-label>
+      <input matInput type="password" [(ngModel)]="apiKeyInput" placeholder="dev-api-key" />
+    </mat-form-field>
+    @if (message(); as text) {
+      <p class="message">{{ text }}</p>
+    }
+  </mat-card-content>
+  <mat-card-actions>
+    <button matButton="filled" (click)="save()" [disabled]="checking() || !apiKeyInput.trim()">
+      Save &amp; verify
+    </button>
+    <button matButton (click)="clear()">Clear</button>
+  </mat-card-actions>
+</mat-card>

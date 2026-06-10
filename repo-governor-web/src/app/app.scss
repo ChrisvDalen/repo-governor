@@ -1,0 +1,37 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.toolbar {
+  background: #1a237e;
+  color: #fff;
+
+  .brand {
+    font-weight: 600;
+  }
+
+  .hint {
+    margin-left: auto;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+}
+
+.layout {
+  flex: 1;
+}
+
+.sidenav {
+  width: 220px;
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.active-link {
+  background: rgba(26, 35, 126, 0.1);
+  border-radius: 8px;
+}

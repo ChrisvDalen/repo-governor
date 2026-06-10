@@ -17,7 +17,9 @@ import java.util.regex.Pattern;
  */
 public final class ControllerUsesRepositoryRule implements Rule {
 
-    private static final Pattern REPOSITORY_USAGE = Pattern.compile("\\b\\w+Repository\\b");
+    // Matches type usages such as 'UserRepository userRepository' or an import
+    // of a *Repository type, but not method names like 'listForRepository'.
+    private static final Pattern REPOSITORY_USAGE = Pattern.compile("\\b[A-Z]\\w*Repository\\b");
 
     @Override
     public String id() {
