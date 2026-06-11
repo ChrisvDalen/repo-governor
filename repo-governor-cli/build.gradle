@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+dependencies {
+    implementation project(':repo-governor-core')
+    implementation 'info.picocli:picocli:4.7.7'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.7'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'org.assertj:assertj-core:3.27.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    mainClass = 'io.repogovernor.cli.RepoGovernorCli'
+    applicationName = 'repo-governor'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Aproject=repo-governor-cli']
+}
+
+// Self-contained jar so the CLI can be run with 'java -jar'.
+tasks.register('fatJar', Jar) {
+    dependsOn configurations.runtimeClasspath
+    archiveClassifier = 'all'
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.main.output
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+
+assemble.dependsOn fatJar

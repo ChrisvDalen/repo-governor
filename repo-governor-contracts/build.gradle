@@ -1,0 +1,6 @@
+// Contract-first API definition. This module only carries the OpenAPI spec;
+// the server serves it at /api/docs/openapi.yaml and the Angular client types
+// in repo-governor-web/src/app/shared/api mirror it.
+plugins {
+    id 'base'
+}

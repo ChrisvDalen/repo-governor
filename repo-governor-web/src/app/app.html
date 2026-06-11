@@ -1,0 +1,22 @@
+<mat-toolbar class="toolbar">
+  <span class="brand">Repo Governor</span>
+  @if (!settings.hasApiKey()) {
+    <span class="hint">No API key configured — go to Settings</span>
+  }
+</mat-toolbar>
+
+<mat-sidenav-container class="layout">
+  <mat-sidenav mode="side" opened class="sidenav">
+    <mat-nav-list>
+      @for (item of navItems; track item.path) {
+        <a mat-list-item [routerLink]="item.path" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content class="content">
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

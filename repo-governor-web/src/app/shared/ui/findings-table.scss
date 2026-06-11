@@ -1,0 +1,31 @@
+table {
+  width: 100%;
+}
+
+.title {
+  font-weight: 500;
+}
+
+.rule-id {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.5);
+  font-family: monospace;
+}
+
+.recommendation {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-open { color: #c62828; }
+.status-accepted_risk { color: #ef6c00; }
+.status-resolved { color: #2e7d32; }
+
+.empty {
+  color: rgba(0, 0, 0, 0.5);
+}

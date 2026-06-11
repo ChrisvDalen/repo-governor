@@ -1,0 +1,6 @@
+rootProject.name = 'repo-governor'
+
+include 'repo-governor-core'
+include 'repo-governor-cli'
+include 'repo-governor-server'
+include 'repo-governor-contracts'
