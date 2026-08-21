@@ -4,10 +4,10 @@ Monorepo with four modules:
 
 | Module | Stack | Purpose |
 |---|---|---|
-| `repo-governor-core` | Plain Java 21 (no Spring) | Domain model, scan rules, scoring, JSON/Markdown reporting |
+| `repo-governor-core` | Plain Java 25 (no Spring) | Domain model, scan rules, scoring, JSON/Markdown reporting |
 | `repo-governor-cli` | Picocli | `init`, `scan`, `report`, `upload`, `rules list` commands |
-| `repo-governor-server` | Spring Boot 4, PostgreSQL, Flyway | REST API (`/api/v1/**`), API-key auth, dashboard aggregation |
-| `repo-governor-web` | Angular 21, Material, signals | SaaS dashboard |
+| `repo-governor-server` | Spring Boot 4.1, PostgreSQL, Flyway | REST API (`/api/v1/**`), API-key auth, dashboard aggregation |
+| `repo-governor-web` | Angular 22, Material, signals | SaaS dashboard |
 
 `repo-governor-contracts/openapi.yaml` is the contract-first API definition.
 

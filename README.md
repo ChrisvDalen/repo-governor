@@ -7,9 +7,9 @@
 *A developer governance platform that scans repositories and scores them on engineering maturity — so developers, tech leads and engineering managers keep every repo healthy, secure, maintainable and consistent.*
 
 [![CI](https://github.com/ChrisvDalen/repo-governor/actions/workflows/ci.yml/badge.svg)](https://github.com/ChrisvDalen/repo-governor/actions/workflows/ci.yml)
-![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot&logoColor=white)
-![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)
+![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?logo=springboot&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-85EA2D?logo=openapiinitiative&logoColor=black)
 
@@ -51,9 +51,9 @@ flowchart LR
     end
     CORE["repo-governor-core<br/><i>rules · scoring · reporting</i>"]
     subgraph SaaS
-        API["repo-governor-server<br/><i>Spring Boot 4 · REST API</i>"]
+        API["repo-governor-server<br/><i>Spring Boot 4.1 · REST API</i>"]
         DB[("PostgreSQL<br/><i>Flyway migrations</i>")]
-        WEB["repo-governor-web<br/><i>Angular 21 · Material · signals</i>"]
+        WEB["repo-governor-web<br/><i>Angular 22 · Material · signals</i>"]
     end
     CONTRACT[["repo-governor-contracts<br/><i>OpenAPI 3</i>"]]
 
@@ -69,8 +69,8 @@ flowchart LR
 |---|---|---|
 | [`repo-governor-core`](repo-governor-core) | Plain Java — **zero Spring** | Domain model, 24 scan rules, scoring engine, JSON/Markdown reporting |
 | [`repo-governor-cli`](repo-governor-cli) | Picocli | `init` · `scan` · `report` · `upload` · `rules list` |
-| [`repo-governor-server`](repo-governor-server) | Spring Boot 4 · PostgreSQL · Flyway | REST API, API-key auth, scan storage & diffing, dashboard aggregation |
-| [`repo-governor-web`](repo-governor-web) | Angular 21 · Material · signals | The SaaS dashboard |
+| [`repo-governor-server`](repo-governor-server) | Spring Boot 4.1 · PostgreSQL · Flyway | REST API, API-key auth, scan storage & diffing, dashboard aggregation |
+| [`repo-governor-web`](repo-governor-web) | Angular 22 · Material · signals | The SaaS dashboard |
 | [`repo-governor-contracts`](repo-governor-contracts) | OpenAPI 3 | Contract-first API definition, served at `/api/docs/openapi.yaml` |
 
 **Design rules, enforced by ArchUnit:** controllers never touch Spring Data repositories or JPA
@@ -79,12 +79,9 @@ report is the only coupling. In core: rules return `Finding`s and never print, r
 decoupled from scanning, and all file access goes through the `RepoFiles` abstraction so every
 rule is unit-testable in memory.
 
-> **Java version note:** the product targets Java 25; this build pins the Gradle toolchain to
-> Java 21 (the newest LTS in the development environment). Bump it in the root `build.gradle`.
-
 ## 🚀 Quick start
 
-**Prerequisites:** JDK 21+, Node.js 22+, Docker.
+**Prerequisites:** JDK 25+, Node.js 22+, Docker.
 
 ```bash
 # 1. Backend — seeds organization 'demo-org' with API key 'dev-api-key'
