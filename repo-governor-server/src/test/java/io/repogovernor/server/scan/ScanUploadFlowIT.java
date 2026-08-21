@@ -4,7 +4,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -36,11 +35,8 @@ class ScanUploadFlowIT {
     @LocalServerPort
     int port;
 
-    @Autowired
-    RestClient.Builder restClientBuilder;
-
     private RestClient client() {
-        return restClientBuilder
+        return RestClient.builder()
                 .baseUrl("http://localhost:" + port)
                 .defaultHeader("X-API-Key", "dev-api-key")
                 .build();
