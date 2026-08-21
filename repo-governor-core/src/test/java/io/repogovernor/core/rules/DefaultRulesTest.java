@@ -90,7 +90,7 @@ class DefaultRulesTest {
     @Test
     void junitRuleChecksBuildFiles() {
         var withJunit = InMemoryRepoFiles.repo()
-                .withFile("build.gradle", "testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'");
+                .withFile("build.gradle", "testImplementation 'org.junit.jupiter:junit-jupiter:6.1.3'");
         var withoutJunit = InMemoryRepoFiles.repo().withFile("build.gradle", "dependencies {}");
 
         var junitRule = new BuildDependencyRule("java.junit.exists", "JUnit", "junit", Severity.MAJOR, "add it");
